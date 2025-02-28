@@ -12,26 +12,22 @@
     <script src="https://cdn.jsdelivr.net/gh/blasten/turn.js/turn.min.js"></script>
 
     <style>
-        body { text-align: center; background-color: #ffffff; }
+        body { text-align: center; background-color: #f5f5f5; margin: 0; padding: 0; }
         #flipbook {
-            width: 800px;
-            height: 500px;
             margin: 50px auto;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
         }
         .page {
-            width: 400px;
-            height: 500px;
-            background-color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            background-color: white;
         }
         .page img {
-            width: auto;
-            height: 40%;
-            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Evita recortes y mantiene proporción */
         }
         /* Botones */
         .controls {
@@ -64,7 +60,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // 📌 Generar automáticamente imágenes desde img/1.jpg hasta img/250.jpg
             const imagenes = [];
             for (let i = 1; i <= 250; i++) {
                 imagenes.push(`img/${i}.jpg`);
@@ -72,7 +67,7 @@
 
             let flipbook = document.getElementById("flipbook");
 
-            // Agregar imágenes dinámicamente
+            // Crear páginas dinámicamente
             imagenes.forEach(src => {
                 let page = document.createElement("div");
                 page.classList.add("page");
@@ -82,18 +77,34 @@
                 flipbook.appendChild(page);
             });
 
-            // Inicializar turn.js después de agregar imágenes
-            setTimeout(function() {
-                $("#flipbook").turn({
-                    width: 800,
-                    height: 500,
-                    autoCenter: true,
-                    display: 'double',
-                    acceleration: true,
-                    gradients: true,
-                    elevation: 50
+            // Ajustar tamaño del flipbook al tamaño de la primera imagen
+            let primeraImagen = new Image();
+            primeraImagen.src = imagenes[0];
+            primeraImagen.onload = function() {
+                let width = primeraImagen.width;
+                let height = primeraImagen.height;
+
+                flipbook.style.width = width * 2 + "px"; // Doble ancho para el efecto libro
+                flipbook.style.height = height + "px";
+
+                document.querySelectorAll(".page").forEach(page => {
+                    page.style.width = width + "px";
+                    page.style.height = height + "px";
                 });
-            }, 500);
+
+                // Inicializar turn.js después de ajustar el tamaño
+                setTimeout(function() {
+                    $("#flipbook").turn({
+                        width: width * 2,
+                        height: height,
+                        autoCenter: true,
+                        display: 'double',
+                        acceleration: true,
+                        gradients: true,
+                        elevation: 50
+                    });
+                }, 500);
+            };
 
             // Botones de navegación
             document.getElementById("prevPage").addEventListener("click", function() {
